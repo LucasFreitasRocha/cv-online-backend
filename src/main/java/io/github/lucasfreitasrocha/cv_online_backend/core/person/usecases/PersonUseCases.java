@@ -18,14 +18,32 @@ public class PersonUseCases implements PersonUseCasesGateway {
 
     @Override
     public PersonDomain createPerson(PersonDomain personDomain) {
-
-        if(foundByCode(personDomain.getCode())){
-            handlerError.init().addFieldError("code", "must be unique").handle();
-        }
+        validateCreatePerson(personDomain);
         return gateway.save(personDomain);
     }
 
-    private boolean foundByCode(String code){
-        return !Objects.isNull(gateway.findByCode(code));
+    private void validateCreatePerson(PersonDomain personDomain){
+        handlerError.init();
+        if(!Objects.isNull(gateway.findByCode(personDomain.getCode()))){
+            handlerError.addFieldError("code", "must be unique");
+        }
+
+        if(personDomain.getCode().length() > 12){
+            handlerError.addFieldError("code", "must be less than 12 characters");
+        }
+
+        if(!validateEmail(personDomain.getEmail())){
+            handlerError.addFieldError("email", "must be valid");
+        }
+        if(!handlerError.getCustomExceptionDomain().getErrors().isEmpty()){
+            handlerError.handle();
+        }
     }
+
+    private boolean validateEmail(String email){
+        if(email==null) return false;
+        if(email.contains(" ")) return false;
+        return email.matches("[\\w\\S]+[@]+[\\w\\S]+[.]+[\\w\\S]+");
+    }
+
 }

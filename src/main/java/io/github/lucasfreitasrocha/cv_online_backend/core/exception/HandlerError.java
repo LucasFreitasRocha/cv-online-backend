@@ -1,9 +1,11 @@
 package io.github.lucasfreitasrocha.cv_online_backend.core.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@Getter
 public class HandlerError {
 
     private CustomExceptionDomain customExceptionDomain;
